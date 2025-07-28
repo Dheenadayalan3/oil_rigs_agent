@@ -40,10 +40,17 @@ const CloudStatusPanel: React.FC = () => {
       lastUpdate: new Date().toLocaleTimeString()
     },
     {
-      name: 'OpenAI GPT-4',
+      name: 'ChatGPT (OpenAI)',
       status: 'connected',
       icon: Zap,
-      description: 'AI-powered report generation',
+      description: 'Production AI analysis and reporting',
+      lastUpdate: new Date().toLocaleTimeString()
+    },
+    {
+      name: 'Google Gemini',
+      status: 'connected',
+      icon: Zap,
+      description: 'Backup AI service for development',
       lastUpdate: new Date().toLocaleTimeString()
     }
   ]);

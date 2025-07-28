@@ -5,7 +5,6 @@ import { pumps, generateSensorData } from '../data/sampleData';
 import { PhysicsChecker } from '../agents/PhysicsChecker';
 import { MLModel } from '../agents/MLModel';
 import { EnhancedReporter } from '../agents/EnhancedReporter';
-import { AWSDataService } from '../services/awsDataService';
 import PumpCard from './PumpCard';
 import SensorChart from './SensorChart';
 import AnomalyList from './AnomalyList';
@@ -29,7 +28,7 @@ const Dashboard: React.FC = () => {
 
   const physicsChecker = new PhysicsChecker();
   const mlModel = new MLModel();
-  const enhancedReporter = EnhancedReporter.getInstance();
+  const enhancedReporter = EnhancedReporter.getInstance(false); // Use Google AI for now
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -63,13 +62,6 @@ const Dashboard: React.FC = () => {
     for (const pump of pumps) {
       const data = generateSensorData(pump.id);
       
-      // Store sensor data in AWS Timestream
-      try {
-        await AWSDataService.storeSensorData(data);
-      } catch (error) {
-        console.warn('AWS storage unavailable, using local storage');
-      }
-      
       if (!newData[pump.id]) {
         newData[pump.id] = [];
       }
@@ -93,15 +85,6 @@ const Dashboard: React.FC = () => {
       const physicsAnomalies = physicsChecker.checkThresholds(data);
       newAnomalies.push(...physicsAnomalies);
 
-      // Store anomalies in AWS DynamoDB
-      for (const anomaly of physicsAnomalies) {
-        try {
-          await AWSDataService.storeAnomaly(anomaly);
-        } catch (error) {
-          console.warn('AWS anomaly storage unavailable');
-        }
-      }
-
       // ML-based analysis
       setAgentState({
         step: 'ml',
@@ -115,15 +98,6 @@ const Dashboard: React.FC = () => {
       mlModel.addData(data);
       const mlAnomalies = mlModel.detectAnomalies(data);
       newAnomalies.push(...mlAnomalies);
-
-      // Store ML anomalies in AWS
-      for (const anomaly of mlAnomalies) {
-        try {
-          await AWSDataService.storeAnomaly(anomaly);
-        } catch (error) {
-          console.warn('AWS ML anomaly storage unavailable');
-        }
-      }
     }
 
     // Generate AI-enhanced report
@@ -131,7 +105,7 @@ const Dashboard: React.FC = () => {
       step: 'reporting',
       progress: 80,
       currentAgent: 'Reporter',
-      message: 'Generating AI-powered maintenance report with ChatGPT...'
+      message: 'Generating AI-powered maintenance report...'
     });
 
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -142,17 +116,22 @@ const Dashboard: React.FC = () => {
 
     if (selectedPumpData) {
       // Generate AI-enhanced report
-      const newReport = await enhancedReporter.generateAIReport(
-        selectedPumpAnomalies, 
-        selectedPumpData, 
-        selectedPumpInfo
-      );
-      setReport(newReport);
+      try {
+        const newReport = await enhancedReporter.generateAIReport(
+          selectedPumpAnomalies, 
+          selectedPumpData, 
+          selectedPumpInfo
+        );
+        setReport(newReport);
 
-      // Get AI analysis of anomaly patterns
-      if (selectedPumpAnomalies.length > 0) {
-        const analysis = await enhancedReporter.analyzeAnomalyPatterns(selectedPumpAnomalies);
-        setAiAnalysis(analysis);
+        // Get AI analysis of anomaly patterns
+        if (selectedPumpAnomalies.length > 0) {
+          const analysis = await enhancedReporter.analyzeAnomalyPatterns(selectedPumpAnomalies);
+          setAiAnalysis(analysis);
+        }
+      } catch (error) {
+        console.error('AI report generation failed:', error);
+        setReport('AI report generation temporarily unavailable. Using fallback analysis.');
       }
     }
 
@@ -274,9 +253,8 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Sensor Charts */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Data Source Information */}
+          {/* Data Source Information */}
+          <div className="lg:col-span-3 mb-6">
             <DataSourcePanel />
           </div>
           
@@ -331,7 +309,7 @@ const Dashboard: React.FC = () => {
                   <h2 className="text-lg font-semibold text-gray-900">AI-Enhanced Analysis Report</h2>
                   <div className="flex items-center space-x-2 text-sm text-blue-600">
                     <Activity className="w-4 h-4" />
-                    <span>Powered by ChatGPT + AWS</span>
+                    <span>Powered by Google AI</span>
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">

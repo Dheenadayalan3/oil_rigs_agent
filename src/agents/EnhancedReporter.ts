@@ -1,15 +1,21 @@
 import { Anomaly, SensorData, Pump } from '../types';
+import { GoogleAIService } from '../services/googleAIService';
 import { OpenAIService } from '../services/openaiService';
 import { AWSDataService } from '../services/awsDataService';
 
 export class EnhancedReporter {
   private static instance: EnhancedReporter;
+  private useOpenAI: boolean;
   
-  static getInstance(): EnhancedReporter {
+  static getInstance(useOpenAI: boolean = true): EnhancedReporter {
     if (!EnhancedReporter.instance) {
-      EnhancedReporter.instance = new EnhancedReporter();
+      EnhancedReporter.instance = new EnhancedReporter(useOpenAI);
     }
     return EnhancedReporter.instance;
+  }
+
+  private constructor(useOpenAI: boolean = true) {
+    this.useOpenAI = useOpenAI;
   }
 
   async generateAIReport(
@@ -22,13 +28,10 @@ export class EnhancedReporter {
       const historicalAnomalies = await AWSDataService.getRecentAnomalies(pump.id, 20);
       const historicalContext = this.buildHistoricalContext(historicalAnomalies);
 
-      // Generate AI-powered report using ChatGPT
-      const aiReport = await OpenAIService.generateMaintenanceReport(
-        anomalies,
-        sensorData,
-        pump,
-        historicalContext
-      );
+      // Generate AI-powered report using selected AI service
+      const aiReport = this.useOpenAI 
+        ? await OpenAIService.generateMaintenanceReport(anomalies, sensorData, pump, historicalContext)
+        : await GoogleAIService.generateMaintenanceReport(anomalies, sensorData, pump, historicalContext);
 
       // Store the report in S3 for future reference
       await AWSDataService.storeMaintenanceReport(
@@ -51,7 +54,9 @@ export class EnhancedReporter {
     timeToFailure: string;
   }> {
     try {
-      return await OpenAIService.analyzeAnomalyPattern(anomalies);
+      return this.useOpenAI 
+        ? await OpenAIService.analyzeAnomalyPattern(anomalies)
+        : await GoogleAIService.analyzeAnomalyPattern(anomalies);
     } catch (error) {
       console.error('Error analyzing anomaly patterns:', error);
       return {
@@ -68,7 +73,9 @@ export class EnhancedReporter {
     anomalyHistory: Anomaly[]
   ): Promise<string> {
     try {
-      return await OpenAIService.generateMaintenanceSchedule(pumpData, anomalyHistory);
+      return this.useOpenAI 
+        ? await OpenAIService.generateMaintenanceSchedule(pumpData, anomalyHistory)
+        : await GoogleAIService.generateMaintenanceSchedule(pumpData, anomalyHistory);
     } catch (error) {
       console.error('Error generating maintenance schedule:', error);
       return 'Unable to generate maintenance schedule. Please consult maintenance team.';

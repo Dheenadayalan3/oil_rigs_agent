@@ -1,0 +1,128 @@
+{
+  "pumps": [
+    {
+      "id": "PUMP-001",
+      "name": "Primary Seawater Pump",
+      "location": "Platform A - Deck 2",
+      "status": "normal",
+      "efficiency": 94.2,
+      "operatingHours": 8760,
+      "lastMaintenance": "2024-01-15",
+      "sensorData": [
+        {
+          "timestamp": 1703097600000,
+          "vibration": 2.1,
+          "temperature": 45.2,
+          "pressure": 3.0,
+          "flowRate": 200.5,
+          "current": 10.2,
+          "voltage": 460.1
+        },
+        {
+          "timestamp": 1703097900000,
+          "vibration": 2.3,
+          "temperature": 46.1,
+          "pressure": 2.98,
+          "flowRate": 198.7,
+          "current": 10.4,
+          "voltage": 459.8
+        }
+      ]
+    },
+    {
+      "id": "PUMP-002",
+      "name": "Cooling Water Pump",
+      "location": "Platform A - Engine Room",
+      "status": "normal",
+      "efficiency": 91.8,
+      "operatingHours": 7320,
+      "lastMaintenance": "2024-02-01",
+      "sensorData": [
+        {
+          "timestamp": 1703097600000,
+          "vibration": 1.8,
+          "temperature": 42.3,
+          "pressure": 2.7,
+          "flowRate": 170.2,
+          "current": 8.1,
+          "voltage": 465.2
+        }
+      ]
+    },
+    {
+      "id": "PUMP-003",
+      "name": "Fire Water Pump",
+      "location": "Platform B - Safety Deck",
+      "status": "warning",
+      "efficiency": 87.5,
+      "operatingHours": 12450,
+      "lastMaintenance": "2023-11-20",
+      "sensorData": [
+        {
+          "timestamp": 1703097600000,
+          "vibration": 3.2,
+          "temperature": 58.7,
+          "pressure": 3.2,
+          "flowRate": 225.1,
+          "current": 12.3,
+          "voltage": 455.4
+        }
+      ]
+    },
+    {
+      "id": "PUMP-004",
+      "name": "Ballast Water Pump",
+      "location": "Platform B - Lower Deck",
+      "status": "critical",
+      "efficiency": 78.3,
+      "operatingHours": 15680,
+      "lastMaintenance": "2023-09-10",
+      "sensorData": [
+        {
+          "timestamp": 1703097600000,
+          "vibration": 5.8,
+          "temperature": 82.1,
+          "pressure": 2.1,
+          "flowRate": 145.3,
+          "current": 13.5,
+          "voltage": 435.2
+        }
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "id": "PUMP-004-vibration-1703097600001",
+      "pumpId": "PUMP-004",
+      "timestamp": 1703097600000,
+      "type": "vibration_threshold",
+      "severity": "critical",
+      "confidence": 0.95,
+      "description": "Vibration reading of 5.80 mm/s is above safe operating range (0-4.2 mm/s)",
+      "recommendation": "Stop pump and perform emergency maintenance",
+      "parameters": ["vibration"]
+    },
+    {
+      "id": "PUMP-004-temperature-1703097600002",
+      "pumpId": "PUMP-004",
+      "timestamp": 1703097600000,
+      "type": "temperature_threshold",
+      "severity": "critical",
+      "confidence": 0.95,
+      "description": "Temperature reading of 82.1°C is above safe operating range (20-72°C)",
+      "recommendation": "Emergency shutdown - overheating detected",
+      "parameters": ["temperature"]
+    },
+    {
+      "id": "PUMP-003-temperature-1703097600003",
+      "pumpId": "PUMP-003",
+      "timestamp": 1703097600000,
+      "type": "temperature_threshold",
+      "severity": "medium",
+      "confidence": 0.85,
+      "description": "Temperature reading of 58.7°C approaching upper limit",
+      "recommendation": "Check coolant flow and heat exchanger",
+      "parameters": ["temperature"]
+    }
+  ]
+}
