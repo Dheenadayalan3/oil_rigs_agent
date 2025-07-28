@@ -35,10 +35,20 @@ const Dashboard: React.FC = () => {
   const enhancedReporter = EnhancedReporter.getInstance(useOpenAI);
 
   useEffect(() => {
-    // Check which AI services are available on component mount
+    // Check which AI services are available on component mount - prioritize Google AI
     const checkAIServices = async () => {
       const envStatus = ConnectionChecker.getEnvironmentStatus();
       
+      // First check Google AI (our primary service)
+      if (envStatus.googleaiConfigured) {
+        const googleCheck = await ConnectionChecker.checkGoogleAI(import.meta.env.VITE_GOOGLE_API_KEY);
+        if (googleCheck.connected) {
+          setUseOpenAI(false); // Use Google AI
+          return;
+        }
+      }
+      
+      // Fallback to OpenAI if Google AI is not available
       if (envStatus.openaiConfigured) {
         const openaiCheck = await ConnectionChecker.checkOpenAI(import.meta.env.VITE_OPENAI_API_KEY);
         if (openaiCheck.connected) {
@@ -47,7 +57,7 @@ const Dashboard: React.FC = () => {
         }
       }
       
-      // Fallback to Google AI if OpenAI is not available
+      // Default to Google AI even if not connected (will show appropriate errors)
       setUseOpenAI(false);
     };
 
@@ -333,7 +343,7 @@ const Dashboard: React.FC = () => {
                   <h2 className="text-lg font-semibold text-gray-900">AI-Enhanced Analysis Report</h2>
                   <div className="flex items-center space-x-2 text-sm text-blue-600">
                     <Activity className="w-4 h-4" />
-                    <span>Powered by Google AI</span>
+                    <span>Powered by {useOpenAI ? 'ChatGPT (OpenAI)' : 'Google Gemini AI'}</span>
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">

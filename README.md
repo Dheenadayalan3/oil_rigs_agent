@@ -8,11 +8,11 @@ This system uses **ChatGPT (OpenAI)** for production AI analysis and **Google Ge
 
 1. **Create `.env` file** with your API keys:
 ```env
-# OpenAI Configuration (PRIMARY - for production)
-VITE_OPENAI_API_KEY=sk-your-openai-api-key-here
-
-# Google AI Configuration (BACKUP - for development)
+# Google AI Configuration (PRIMARY - for production)
 VITE_GOOGLE_API_KEY=AIzaSyBjIRVSZqL6Ix2lSSfA-OGPYiaSvjKtxEY
+
+# OpenAI Configuration (BACKUP - if available)
+VITE_OPENAI_API_KEY=sk-your-openai-api-key-here
 
 # AWS Configuration
 VITE_AWS_REGION=us-east-1
@@ -26,22 +26,22 @@ VITE_AWS_LAMBDA_FUNCTION=pump-anomaly-processor
 ```
 
 2. **AI Service Configuration**:
-   - **Production**: Uses ChatGPT (OpenAI) for intelligent analysis
-   - **Development**: Falls back to Google Gemini if needed
+   - **Production**: Uses Google Gemini AI for intelligent analysis
+   - **Backup**: Falls back to ChatGPT (OpenAI) if needed
    - **Hybrid Approach**: Physics + ML + LLM analysis
 
 ### 🚀 Features
 
 - **Real-time Monitoring**: 4 offshore pumps with 6 sensor parameters
 - **LangGraph Simulation**: Multi-agent workflow visualization
-- **ChatGPT Integration**: Professional maintenance reports and insights
+- **Google AI Integration**: Professional maintenance reports and insights
 - **AWS Cloud Storage**: Timestream, DynamoDB, S3, Lambda integration
 - **Hybrid Detection**: Physics thresholds + ML anomaly detection
 
 ### 🎯 Production Architecture
 
 ```
-Sensor Data → Physics Agent → ML Agent → ChatGPT Analysis → AWS Storage
+Sensor Data → Physics Agent → ML Agent → Google AI Analysis → AWS Storage
      ↓              ↓           ↓            ↓              ↓
   Real-time     Threshold   Pattern      AI Reports    Cloud Archive
   Updates       Checking    Detection    Generation    & Analytics
@@ -51,8 +51,8 @@ Sensor Data → Physics Agent → ML Agent → ChatGPT Analysis → AWS Storage
 
 - **Pump Status Cards**: Real-time health indicators
 - **Agent Flow**: Visual LangGraph workflow
-- **AI Reports**: ChatGPT-powered maintenance insights
+- **AI Reports**: Google AI-powered maintenance insights
 - **Cloud Status**: AWS service monitoring
 - **Anomaly Timeline**: Severity-based alerts
 
-Start monitoring to see the production AI system in action!
+Start monitoring to see the Google AI-powered system in action!
