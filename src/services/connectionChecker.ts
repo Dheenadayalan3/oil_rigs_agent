@@ -1,6 +1,5 @@
 // Service to check actual connectivity to external services
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  
+export class ConnectionChecker {
   static async checkOpenAI(apiKey: string): Promise<{ connected: boolean; error?: string }> {
     if (!apiKey) {
       return { connected: false, error: 'API key not provided' };
@@ -123,7 +122,7 @@
       openaiConfigured: !!import.meta.env.VITE_OPENAI_API_KEY,
       googleaiConfigured: !!import.meta.env.VITE_GOOGLE_API_KEY,
       awsConfigured: this.checkAWSCredentials().configured,
-      message: 'VITE_OPENAI_API_KEY not configured'
+      missingVars
     };
   }
 }
