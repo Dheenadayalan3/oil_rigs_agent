@@ -11,6 +11,7 @@ import AnomalyList from './AnomalyList';
 import AgentFlow from './AgentFlow';
 import DataSourcePanel from './DataSourcePanel';
 import CloudStatusPanel from './CloudStatusPanel';
+import { ConnectionChecker } from '../services/connectionChecker';
 
 const Dashboard: React.FC = () => {
   const [isMonitoring, setIsMonitoring] = useState(false);
@@ -28,7 +29,30 @@ const Dashboard: React.FC = () => {
 
   const physicsChecker = new PhysicsChecker();
   const mlModel = new MLModel();
-  const enhancedReporter = EnhancedReporter.getInstance(false); // Use Google AI for now
+  
+  // Determine which AI service to use based on availability
+  const [useOpenAI, setUseOpenAI] = useState(false);
+  const enhancedReporter = EnhancedReporter.getInstance(useOpenAI);
+
+  useEffect(() => {
+    // Check which AI services are available on component mount
+    const checkAIServices = async () => {
+      const envStatus = ConnectionChecker.getEnvironmentStatus();
+      
+      if (envStatus.openaiConfigured) {
+        const openaiCheck = await ConnectionChecker.checkOpenAI(import.meta.env.VITE_OPENAI_API_KEY);
+        if (openaiCheck.connected) {
+          setUseOpenAI(true);
+          return;
+        }
+      }
+      
+      // Fallback to Google AI if OpenAI is not available
+      setUseOpenAI(false);
+    };
+
+    checkAIServices();
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
